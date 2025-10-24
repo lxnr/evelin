@@ -10,7 +10,7 @@ from groq import Groq
 
 # Конфигурация
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN', '8390567943:AAE-pqgOus6rZbymm93RH1e5mwug4k8OFSc')
-GROQ_API_KEY = os.getenv('GROQ_API_KEY')  # Получить на https://console.groq.com
+GROQ_API_KEY = os.getenv('GROQ_API_KEY', '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')  # Получить на https://console.groq.com
 
 # Настройка Groq AI
 groq_client = None
