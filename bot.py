@@ -10,7 +10,7 @@ import google.generativeai as genai
 
 # Конфигурация
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN', '8390567943:AAE-pqgOus6rZbymm93RH1e5mwug4k8OFSc')
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')  # Нужно будет получить на https://makersuite.google.com/app/apikey
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyAzEQFqSfvk_fB9KueIRqtGlx_mb3lA1_8')  # Нужно будет получить на https://makersuite.google.com/app/apikey
 
 # Настройка Gemini
 if GEMINI_API_KEY:
