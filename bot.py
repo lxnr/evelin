@@ -14,8 +14,12 @@ GROQ_API_KEY = os.getenv('GROQ_API_KEY', 'gsk_Eqrn88Id1dgmTem6ma4yWGdyb3FYWjoRza
 
 # Настройка Groq AI
 groq_client = None
-if GROQ_API_KEY:
-    groq_client = Groq(api_key=GROQ_API_KEY)
+if GROQ_API_KEY and len(GROQ_API_KEY.strip()) > 0:
+    try:
+        groq_client = Groq(api_key=GROQ_API_KEY)
+    except Exception as e:
+        print(f"Error initializing Groq: {e}")
+        groq_client = None
 
 # Хранилище диалогов
 conversations = {}
@@ -151,7 +155,11 @@ class EvelinBot:
         """Генерация ответа от Эвелин с НАСТОЯЩИМ мышлением"""
         try:
             if not groq_client:
-                return "слушай, у меня проблемы с интернетом, напиши позже"
+                # Fallback режим - простые естественные ответы
+                answer = self.get_fallback_response(user_message)
+                self.add_to_history(user_id, 'user', user_message)
+                self.add_to_history(user_id, 'assistant', answer)
+                return answer
 
             # Получаем историю
             history = self.get_conversation_history(user_id)
@@ -202,15 +210,44 @@ class EvelinBot:
 
         except Exception as e:
             print(f"Error generating response: {e}")
-            # Если ошибка - говорим естественно
-            error_responses = [
-                "прости, тупанула)",
-                "не поняла, повтори?",
-                "что?",
-                "у меня телефон глючит",
-                "напиши еще раз"
-            ]
-            return random.choice(error_responses)
+            # Если ошибка - используем fallback
+            return self.get_fallback_response(user_message)
+
+    def get_fallback_response(self, message: str) -> str:
+        """Простые естественные ответы если нет API"""
+        message_lower = message.lower()
+
+        responses = {
+            'привет': ['привет)', 'приветик', 'привет, как дела?', 'хай'],
+            'как дела': ['нормально, а у тебя?', 'хорошо) ты как?', 'устала сегодня', 'да неплохо'],
+            'люблю': ['и я тебя', 'я тоже)', 'знаю)'],
+            'скучаю': ['я тоже', 'соскучилась', 'ну иди сюда тогда)'],
+            'что делаешь': ['ничего особенного', 'да так, лежу', 'думаю о тебе', 'сериал смотрю'],
+            'где': ['тут я', 'дома', 'на учебе', 'гуляю'],
+            'спокойной': ['спокойной ночи', 'сладких снов', 'и тебе', 'споки)'],
+        }
+
+        for key, answers in responses.items():
+            if key in message_lower:
+                return random.choice(answers)
+
+        default_responses = [
+            'мм',
+            'что?',
+            'хз',
+            'интересно',
+            'расскажи подробнее',
+            'ага',
+            'понятно',
+            'а',
+            'и?',
+            'ну и как?',
+            'серьезно?',
+            'хаха',
+            'ладно'
+        ]
+
+        return random.choice(default_responses)
 
     async def send_typing_action(self, context: ContextTypes.DEFAULT_TYPE, chat_id: int, duration: int = 2):
         """Имитация печатания"""
